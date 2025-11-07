@@ -1,0 +1,14 @@
+# .editorconfig
+# Apply to all files
+root = true
+
+[*]
+end_of_line = lf
+indent_style = tab
+insert_final_newline = true
+charset = utf-8
+trim_trailing_whitespace = true
+
+# Optional: specific overrides
+[*.md]
+trim_trailing_whitespace = false  # keep spaces for markdown formatting
