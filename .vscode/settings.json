@@ -1,0 +1,16 @@
+{
+	"files.readonlyInclude": {
+		"uv.lock": true,
+		"dist/**/*": true,
+		"LICENSE": true
+	},
+	"editor.formatOnSave": true,
+	"[javascript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[python]": {
+		"editor.defaultFormatter": "charliermarsh.ruff"
+	},
+	"prettier.singleQuote": false,
+	"prettier.useTabs": true
+}
