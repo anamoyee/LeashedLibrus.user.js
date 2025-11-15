@@ -1,3 +1,7 @@
+#ll_settings_root.hide {
+	display: none;
+}
+
 #ll_settings_root {
 	position: fixed;
 	top: 0;
@@ -9,16 +13,31 @@
 	justify-content: center;
 	align-items: center;
 	transition: opacity 0.3s ease;
-}
+	z-index: 999999999;
 
-#ll_settings_root.hide {
-	display: none;
-}
+	& #ll_settings {
+		width: 75vw;
+		height: 75vh;
+		background: white;
+		padding: 20px;
+		box-sizing: border-box;
 
-#ll_settings {
-	width: 75vw;
-	height: 75vh;
-	background: white;
-	padding: 20px;
-	box-sizing: border-box;
+		& form {
+			display: grid;
+			grid-template-rows: auto 1fr auto;
+			height: 100%;
+
+			& .main-content {
+				font-size: x-large;
+				overflow: auto;
+				margin: 10px;
+				padding: 10px;
+
+				& input[type="checkbox"] {
+					height: 25px;
+					width: 25px;
+				}
+			}
+		}
+	}
 }

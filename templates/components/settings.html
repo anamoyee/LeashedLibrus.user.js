@@ -1,11 +1,36 @@
 <div id="ll_settings_root" class="hide" onclick="document.querySelector('#ll_settings_root').classList.add('hide')">
 	<div id="ll_settings" onclick="event.stopPropagation()">
-		<h1>
-			Settings
-			<!--{{ include("icons/svg/settings.svg") }}-->
-		</h1>
 		<form>
-			<button type="submit">Save</button>
+			<div>
+				<h1>Settings</h1>
+			</div>
+			<div class="main-content">
+				<input type="checkbox" name="test" id="test" />
+				<label for="test">Test</label>
+			</div>
+			<div style="display: flex">
+				<button type="submit" style="height: 100%">Reload to apply everywhere</button>
+				<p id="ll_settings_msg_saved" style="font-size: large; opacity: 0.35">No changes detected</p>
+			</div>
+			<script>
+				function saved() {
+					let p = document.getElementById("ll_settings_msg_saved");
+					let now = new Date();
+					p.innerText = "Saved at %s".replace(/%s/, now.toLocaleTimeString("gb"));
+					p.style.opacity = 1.0;
+					console.log(p);
+				}
+
+				let form = document.currentScript.parentElement;
+
+				form.querySelectorAll("input[type='checkbox']").forEach((el) => {
+					el.checked = document.ll.get(el.id);
+					el.addEventListener("click", (_) => {
+						document.ll.set(el.id, el.checked);
+						saved();
+					});
+				});
+			</script>
 		</form>
 	</div>
 	<!--{{ include_style("css/settings.css") }}-->

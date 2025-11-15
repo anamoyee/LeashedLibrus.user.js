@@ -13,6 +13,16 @@ select#language {
 	display: none;
 }
 
+#main-menu .main-menu-list li:has(> a[href="/ankiety_admin_ankiety"]), /* wtf is this endpoint name */
+#main-menu .main-menu-list li:has(> a[href^="/help"]) {
+	display: none;
+}
+
 div#footer {
+	display: none;
+}
+
+/* /przegladaj_oceny/uczen */
+div.container-icon:has(> table > tbody > tr > td > img[src="/images/naglowek_uczen.png"]) {
 	display: none;
 }

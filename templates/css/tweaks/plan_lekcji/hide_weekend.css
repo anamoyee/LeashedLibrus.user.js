@@ -1,0 +1,34 @@
+.plan-lekcji tr.line1 td,
+.plan-lekcji tr.line1 th {
+	height: 30px !important;
+}
+
+table.plan-lekcji tr > :nth-child(8),
+table.plan-lekcji tr > :nth-child(9),
+table.plan-lekcji tr > :nth-child(10) {
+	display: none;
+}
+
+table.plan-lekcji tr > :nth-child(1) {
+	padding: 0;
+	margin: 0;
+	max-width: 30px;
+}
+
+/* Only the first cell in the first column of thead */
+table.plan-lekcji thead tr:first-child > :nth-child(1) {
+	text-align: center;
+	vertical-align: middle;
+	color: transparent;
+	position: relative;
+}
+
+/* Visually replace text with "#" */
+table.plan-lekcji thead tr:first-child > :nth-child(1)::before {
+	content: "#";
+	color: black;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}

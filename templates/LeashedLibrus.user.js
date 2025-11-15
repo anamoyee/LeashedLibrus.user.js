@@ -6,15 +6,19 @@
 // @author       anamoyee
 // @match        *://*.librus.pl/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
-// @run-at       document-start
+// @run-at       document-body
 // @grant        GM_setValue
 // @grant        GM_getValue
-// @grant        GM_deleteValue
 // ==/UserScript==
 
 var IS_IFRAME = window.top !== window.self;
 var HREF = document.location.href;
 var REF = document.location.href.replace(/^https?:\/\//, "");
+
+document.ll = {
+	get: GM_getValue,
+	set: GM_setValue,
+};
 
 //#region utils.js
 /*{{! i = 10 }}*/
@@ -42,38 +46,9 @@ function apply_css(css) {
 	log("Applied style:", styleElement);
 
 	document.head.appendChild(styleElement);
-	document.body.appendChild(styleElement); // also append to body, in case either gets removed (which happens)
-}
-
-/**
- * Create a DOM element with attributes and children.
- *
- * @param {string} tag
- *   The tag name of the element to create (e.g. "div", "button").
- *
- * @param {Object<string, any>} [props]
- *   Attributes or event handlers to set on the element.
- *   Event handlers must start with "on", e.g. { onclick: () => {} }.
- *
- * @param {...(Node|string)} children
- *   Child nodes to append. Non-Node values are converted to text nodes.
- *
- * @returns {Element}
- *   The newly created DOM element.
- */
-function h(tag, props = {}, ...children) {
-	const el = document.createElement(tag);
-	for (const [k, v] of Object.entries(props)) {
-		if (k.startsWith("on") && typeof v === "function") {
-			el.addEventListener(k.slice(2).toLowerCase(), v);
-		} else {
-			el.setAttribute(k, v);
-		}
-	}
-	for (const c of children) {
-		el.append(c instanceof Node ? c : document.createTextNode(String(c)));
-	}
-	return el;
+	document.addEventListener("DOMContentLoaded", () => {
+		document.body.appendChild(styleElement); // also append to body, in case either gets removed (which happens)
+	});
 }
 
 /**
@@ -82,16 +57,48 @@ function h(tag, props = {}, ...children) {
  * @param {String} html_src
  * @returns {HTMLDivElement}
  */
-function exec_html_into_div(html_src) {
-	var div = document.createElement("div");
+function exec_html_into_div(html_src, { div = undefined, execute_scripts = true } = {}) {
+	if (div === undefined) {
+		div = document.createElement("div");
+	}
 	div.innerHTML = html_src.trim();
 
-	// Change this to div.childNodes to support multiple top-level nodes.
+	if (execute_scripts) {
+		const scripts = div.querySelectorAll("script");
+
+		for (const old of scripts) {
+			const fresh = document.createElement("script");
+
+			for (const attr of old.attributes) {
+				fresh.setAttribute(attr.name, attr.value);
+			}
+
+			if (!old.src) {
+				fresh.textContent = old.textContent;
+			}
+
+			old.replaceWith(fresh);
+		}
+	}
+
 	return div;
 }
 
 /**
- * [Only available when logged in] prepend a \<li> ... \</li>to the top bar (normally: `[Organizacja, Uczeń, Ankiety, ...]`)
+ * Unselect the text on the web page, if any
+ */
+function unselect_on_page() {
+	if (window.getSelection) {
+		const sel = window.getSelection();
+		if (sel) sel.removeAllRanges();
+	} else if (document.selection) {
+		// IE fallback
+		document.selection.empty();
+	}
+}
+
+/**
+ * [Only available when logged in] prepend (unless specified to `append_instead`) a \<li> ... \</li>to the top bar (normally: `[Organizacja, Uczeń, Ankiety, ...]`)
  *
  * The following structure can be adopted to create simple button:
  * ```html
@@ -115,10 +122,11 @@ function exec_html_into_div(html_src) {
  * @param {boolean} [append_instead=false]
  * @param {HTMLLIElement} el
  */
-function prepend_to_top_bar(el, append_instead = false) {
+function add_to_top_bar(el, { append_instead = false } = {}) {
 	let main_menu_list = document.querySelector("#main-menu .main-menu-list");
 
-	if (append_instead) {
+	if (!append_instead) {
+		/* NOTE: the above condition is correct since the list is rendered right-to-left */
 		main_menu_list.append(el);
 	} else {
 		main_menu_list.prepend(el);
@@ -137,9 +145,13 @@ function make_settings_icon_node() {
 }
 
 function install_settings() {
-	if (document.querySelector("#ll_settings_root") === null) {
-		document.body.appendChild(exec_html_into_div(`/*{{ include("components/settings.html") }}*/`));
-	}
+	document.addEventListener("DOMContentLoaded", () => {
+		if (document.querySelector("#ll_settings_root") === null) {
+			let div = document.createElement("div");
+			document.body.appendChild(div);
+			exec_html_into_div(`/*{{ include("components/settings.html") }}*/`, { div: div });
+		}
+	});
 }
 //#endregion
 
@@ -174,6 +186,29 @@ async function main() {
 				/^synergia\.librus\.pl/,
 				() => {
 					apply_css(`/*{{ include('css/adblock.css') }}*/`);
+
+					if (1) {
+						apply_css(`/*{{ include('css/tweaks/terminarz/hide_weekend.css') }}*/`);
+					}
+
+					if (1) {
+						apply_css(`/*{{ include('css/tweaks/plan_lekcji/hide_weekend.css') }}*/`);
+					}
+
+					document.addEventListener("DOMContentLoaded", () => {
+						let settings_li = document.createElement("li");
+						settings_li.appendChild(make_settings_icon_node());
+
+						add_to_top_bar(settings_li, { append_instead: true });
+
+						{
+							/* Don't open plan lekcji in a whole new window */
+							let plan_lekcji_el = document.querySelector(
+								`li > a[href="javascript:otworz_w_nowym_oknie('/przegladaj_plan_lekcji','plan_u',0,0)"]`,
+							);
+							if (plan_lekcji_el) plan_lekcji_el.href = "/przegladaj_plan_lekcji";
+						}
+					});
 				},
 			],
 		];

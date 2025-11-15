@@ -1,7 +1,22 @@
-#settings_icon > svg {
+a#settings_icon {
+	width: 100%;
+	height: 100%;
+	padding-left: 0 !important;
+}
+
+a#settings_icon > svg {
 	transform: scale(70%);
 }
 
-#settings_icon {
-	margin-left: 4px;
+body.portal-rodzina {
+	a#settings_icon > svg {
+		height: 40px;
+	}
+}
+
+body:not(.portal-rodzina) {
+	a#settings_icon > svg {
+		height: 100%;
+		width: 100%;
+	}
 }
