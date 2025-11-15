@@ -30,7 +30,7 @@
 	"emeraldwalk.runonsave": {
 		"commands": [
 			{
-				"match": "templates/.*",
+				"match": "templates/*",
 				"cmd": ".venv/bin/uv run build.py"
 			}
 		]
