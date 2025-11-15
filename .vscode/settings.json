@@ -5,7 +5,19 @@
 		"LICENSE": true
 	},
 	"editor.formatOnSave": true,
+	"files.associations": {
+		"*.css": "scss"
+	},
 	"[javascript]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[html]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[css]": {
+		"editor.defaultFormatter": "esbenp.prettier-vscode"
+	},
+	"[scss]": {
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
 	"[python]": {
