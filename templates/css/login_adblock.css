@@ -1,0 +1,38 @@
+/* remove 'pobierz chujową aplikacje' banner*/
+.app-download {
+	display: none !;
+}
+
+/* remove ads */
+/* [srcset^='https://files.librus.pl/art'], */ /* "art" kurwa 😭 */
+.synergia__advertisment--top-container,
+.synergia__advertisment--side-container-left,
+.synergia__advertisment--side-container-right,
+.synergia__advertisment--content-wrapper > span,
+.synergia__advertisment--content-wrapper > div:not(:has(> #synergiaLogin)) {
+	display: none;
+}
+
+form.search-form input.search-input,
+form.search-form button.search-button,
+a[href="/rodzina/sklep/mobilne-dodatki/wybor"],
+a[href="/szkola"] {
+	display: none !important;
+}
+
+/* make the "pomoc" button unclickable, useful for missclicks */
+a[href="https://www.librus.pl/szkoly/systemy/librus-synergia/dzial-faq/"]
+{
+	pointer-events: none;
+}
+
+/* center the login form */
+.synergia__advertisment--content-wrapper > div:has(> #synergiaLogin),
+.synergia__advertisment--content-wrapper > div:has(> #synergiaLogin) > section {
+	max-width: 100vw;
+}
+
+/* remove the footer */
+footer {
+	display: none !important;
+}

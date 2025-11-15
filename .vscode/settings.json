@@ -11,6 +11,16 @@
 	"[python]": {
 		"editor.defaultFormatter": "charliermarsh.ruff"
 	},
-	"prettier.singleQuote": false,
-	"prettier.useTabs": true
+	// "prettier.singleQuote": false,
+	// "prettier.useTabs": true,
+	// "prettier.printWidth": 120,
+	// prettier settings dont fucking work here
+	"emeraldwalk.runonsave": {
+		"commands": [
+			{
+				"match": "templates/.*",
+				"cmd": ".venv/bin/uv run build.py"
+			}
+		]
+	}
 }

@@ -1,0 +1,24 @@
+#ll_settings_root {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100vh;
+	background: rgba(0, 0, 0, 0.5);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	transition: opacity 0.3s ease;
+}
+
+#ll_settings_root.hide {
+	display: none;
+}
+
+#ll_settings {
+	width: 75vw;
+	height: 75vh;
+	background: white;
+	padding: 20px;
+	box-sizing: border-box;
+}

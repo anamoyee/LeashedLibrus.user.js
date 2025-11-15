@@ -1,0 +1,7 @@
+#settings_icon > svg {
+	transform: scale(70%);
+}
+
+#settings_icon {
+	margin-left: 4px;
+}
