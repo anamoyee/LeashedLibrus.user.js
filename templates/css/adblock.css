@@ -1,0 +1,18 @@
+#main-menu  li:has(> a[href="https://eduranga.pl/librus"])
+{
+	display: none;
+}
+
+/* useless - it just redirects to "how to install translator extension" */
+select#language {
+	display: none;
+}
+
+#graphic-menu li:has(> a[href="/gateway/ms/studentdatapanel/ui/"]),
+#graphic-menu li:has(> a[href="/bezpiecznyUczen"]) {
+	display: none;
+}
+
+div#footer {
+	display: none;
+}

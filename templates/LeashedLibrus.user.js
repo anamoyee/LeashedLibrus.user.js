@@ -6,6 +6,7 @@
 // @author       anamoyee
 // @match        *://*.librus.pl/*
 // @icon         data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw==
+// @run-at       document-start
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @grant        GM_deleteValue
@@ -41,10 +42,11 @@ function apply_css(css) {
 	log("Applied style:", styleElement);
 
 	document.head.appendChild(styleElement);
+	document.body.appendChild(styleElement); // also append to body, in case either gets removed (which happens)
 }
 
 /**
- * Creates a DOM element with attributes and children.
+ * Create a DOM element with attributes and children.
  *
  * @param {string} tag
  *   The tag name of the element to create (e.g. "div", "button").
@@ -75,6 +77,7 @@ function h(tag, props = {}, ...children) {
 }
 
 /**
+ * Execute HTML Source and return it as a div containing it.
  *
  * @param {String} html_src
  * @returns {HTMLDivElement}
@@ -85,6 +88,41 @@ function exec_html_into_div(html_src) {
 
 	// Change this to div.childNodes to support multiple top-level nodes.
 	return div;
+}
+
+/**
+ * [Only available when logged in] prepend a \<li> ... \</li>to the top bar (normally: `[Organizacja, Uczeń, Ankiety, ...]`)
+ *
+ * The following structure can be adopted to create simple button:
+ * ```html
+ * <li>
+ * 	<a href="javascript: 'whatever or add event listener'">Always visible button</a>
+ * </li>
+ * ```
+ *
+ * The following structure can be adopted to create a submenu:
+ * ```html
+ * <li>
+ * 	<a href="javascript: 'whatever or add event listener'">Always visible button</a>
+ * 	<ul>
+ * 		<li><a href="javascript: action1();">Item 1</a></li>
+ * 		<li><a href="javascript: action2();">Item 2</a></li>
+ * 		<li><a href="javascript: action3();">Item 3</a></li>
+ * 	</ul>
+ * </li>
+ * ```
+ *
+ * @param {boolean} [append_instead=false]
+ * @param {HTMLLIElement} el
+ */
+function prepend_to_top_bar(el, append_instead = false) {
+	let main_menu_list = document.querySelector("#main-menu .main-menu-list");
+
+	if (append_instead) {
+		main_menu_list.append(el);
+	} else {
+		main_menu_list.prepend(el);
+	}
 }
 //#endregion
 
@@ -106,15 +144,15 @@ function install_settings() {
 //#endregion
 
 //#region main.js
-function _start() {
+async function _start() {
 	log(`Loading... (${document.querySelectorAll("*").length}, ${HREF})`);
 
 	if (!IS_IFRAME) install_settings();
 
-	main();
+	await main();
 }
 
-function main() {
+async function main() {
 	{
 		/* per-href */
 
@@ -126,10 +164,16 @@ function main() {
 				},
 			],
 			[
-				/portal\.librus\.pl\/rodzina\/synergia\/loguj/,
+				/^portal\.librus\.pl\/rodzina\/synergia\/loguj$/,
 				() => {
-					apply_css(` /*{{ include('css/login_adblock.css') }}*/ `);
+					apply_css(`/*{{ include('css/login_adblock.css') }}*/`);
 					document.querySelector(".navbar_menu").appendChild(make_settings_icon_node());
+				},
+			],
+			[
+				/^synergia\.librus\.pl/,
+				() => {
+					apply_css(`/*{{ include('css/adblock.css') }}*/`);
 				},
 			],
 		];
