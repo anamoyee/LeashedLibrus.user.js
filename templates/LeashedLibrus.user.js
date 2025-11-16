@@ -14,6 +14,7 @@
 var IS_IFRAME = window.top !== window.self;
 var HREF = document.location.href;
 var REF = document.location.href.replace(/^https?:\/\//, "");
+var PARAMS = Object.fromEntries(new URLSearchParams(window.location.search).entries());
 
 document.ll = {
 	get: GM_getValue,
@@ -153,13 +154,39 @@ function install_settings() {
 		}
 	});
 }
+
+{
+	/* Default values for settings */
+
+	var SETTINGS_DEFAULTS = {
+		settings_css_adblock: true,
+		settings_css_hide_weekends: true,
+		settings_customcss: "",
+	};
+
+	for (const key in SETTINGS_DEFAULTS) {
+		const current = document.ll.get(key);
+		if (PARAMS.hasOwnProperty("reset") || current === undefined) {
+			document.ll.set(key, SETTINGS_DEFAULTS[key]);
+		}
+	}
+
+	if (PARAMS.hasOwnProperty("reset")) {
+		const url = new URL(window.location);
+		url.searchParams.delete("reset");
+		window.history.replaceState({}, "", url);
+	}
+}
 //#endregion
 
 //#region main.js
 async function _start() {
 	log(`Loading... (${document.querySelectorAll("*").length}, ${HREF})`);
 
-	if (!IS_IFRAME) install_settings();
+	if (!IS_IFRAME) {
+		apply_css(document.ll.get("settings_customcss"));
+		install_settings();
+	}
 
 	await main();
 }
@@ -176,22 +203,23 @@ async function main() {
 				},
 			],
 			[
-				/^portal\.librus\.pl\/rodzina\/synergia\/loguj$/,
+				/^portal\.librus\.pl\/rodzina\/synergia\/loguj/,
 				() => {
-					apply_css(`/*{{ include('css/login_adblock.css') }}*/`);
+					if (document.ll.get("settings_css_adblock")) {
+						apply_css(`/*{{ include('css/login_adblock.css') }}*/`);
+					}
 					document.querySelector(".navbar_menu").appendChild(make_settings_icon_node());
 				},
 			],
 			[
 				/^synergia\.librus\.pl/,
 				() => {
-					apply_css(`/*{{ include('css/adblock.css') }}*/`);
-
-					if (1) {
-						apply_css(`/*{{ include('css/tweaks/terminarz/hide_weekend.css') }}*/`);
+					if (document.ll.get("settings_css_adblock")) {
+						apply_css(`/*{{ include('css/adblock.css') }}*/`);
 					}
 
-					if (1) {
+					if (document.ll.get("settings_css_hide_weekends")) {
+						apply_css(`/*{{ include('css/tweaks/terminarz/hide_weekend.css') }}*/`);
 						apply_css(`/*{{ include('css/tweaks/plan_lekcji/hide_weekend.css') }}*/`);
 					}
 

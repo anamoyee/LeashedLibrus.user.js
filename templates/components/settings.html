@@ -5,11 +5,26 @@
 				<h1>Settings</h1>
 			</div>
 			<div class="main-content">
-				<input type="checkbox" name="test" id="test" />
-				<label for="test">Test</label>
+				<fieldset>
+					<legend>CSS Tweaks</legend>
+					<label for="settings_css_adblock">
+						<input type="checkbox" name="settings_css_adblock" id="settings_css_adblock" />
+						Adblock + blokada różnych bezużytecznych elementów (Pomoc, EDURANGA, różne takie,,)</label
+					><br />
+					<label for="settings_css_hide_weekends">
+						<input type="checkbox" name="settings_css_hide_weekends" id="settings_css_hide_weekends" />
+						Ukryj weekendy w kalendarzach + lekko alternatywny wygląd kalendarzy (terminarz, plan lekcji)</label
+					><br />
+				</fieldset>
+				<fieldset>
+					<legend>Custom CSS (reset by loading page with <code>?reset</code> param)</legend>
+					<textarea name="settings_customcss" id="settings_customcss" style="width: 100%; height: 100px"></textarea>
+				</fieldset>
 			</div>
 			<div style="display: flex">
-				<button type="submit" style="height: 100%">Reload to apply everywhere</button>
+				<button type="submit" onclick="event.preventDefault(); location.reload()" style="height: 100%">
+					Reload to apply everywhere
+				</button>
 				<p id="ll_settings_msg_saved" style="font-size: large; opacity: 0.35">No changes detected</p>
 			</div>
 			<script>
@@ -18,15 +33,22 @@
 					let now = new Date();
 					p.innerText = "Saved at %s".replace(/%s/, now.toLocaleTimeString("gb"));
 					p.style.opacity = 1.0;
-					console.log(p);
 				}
 
 				let form = document.currentScript.parentElement;
 
 				form.querySelectorAll("input[type='checkbox']").forEach((el) => {
-					el.checked = document.ll.get(el.id);
+					el.checked = document.ll.get(el.id) || false;
 					el.addEventListener("click", (_) => {
 						document.ll.set(el.id, el.checked);
+						saved();
+					});
+				});
+
+				form.querySelectorAll("textarea").forEach((el) => {
+					el.value = document.ll.get(el.id) || "";
+					el.addEventListener("input", () => {
+						document.ll.set(el.id, el.value);
 						saved();
 					});
 				});
