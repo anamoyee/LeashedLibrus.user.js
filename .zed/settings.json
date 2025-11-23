@@ -1,0 +1,65 @@
+// Folder-specific settings
+//
+// For a full list of overridable settings, and general information on folder-specific settings,
+// see the documentation: https://zed.dev/docs/configuring-zed#settings-files
+{
+	"auto_install_extensions": {
+		"html": true,
+		"toml": true
+	},
+	"autosave": "off", // NOTE: this doesnt seem to work? zed bug?
+	"format_on_save": "on",
+	"file_types": {
+		"SCSS": ["*.css"]
+	},
+	"languages": {
+		"JavaScript": {
+			"formatter": [
+				"auto",
+				"prettier",
+				{
+					"external": {
+						"command": "uv",
+						"arguments": ["run", "build.py"]
+					}
+				}
+			]
+		},
+		"CSS": {
+			"formatter": [
+				"auto",
+				"prettier",
+				{
+					"external": {
+						"command": "uv",
+						"arguments": ["run", "build.py"]
+					}
+				}
+			]
+		},
+		"SCSS": {
+			"formatter": [
+				"auto",
+				"prettier",
+				{
+					"external": {
+						"command": "uv",
+						"arguments": ["run", "build.py"]
+					}
+				}
+			]
+		},
+		"HTML": {
+			"formatter": [
+				"auto",
+				"prettier",
+				{
+					"external": {
+						"command": "uv",
+						"arguments": ["run", "build.py"]
+					}
+				}
+			]
+		}
+	}
+}
