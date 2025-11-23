@@ -1,9 +1,10 @@
 import time
+from datetime import datetime
 
 t0 = time.perf_counter()
-
 import pathlib as p
 import re as regex
+import select
 import sys
 import traceback
 from collections.abc import Callable
@@ -23,7 +24,7 @@ if True:  # const
 	TEMPLATES_DIR = ROOT_DIR / "templates"
 	DIST_DIR = ROOT_DIR / "dist"
 
-if True:  # printing utils
+if True:  # utils
 
 	def aprint(
 		__o: object,
@@ -48,6 +49,27 @@ if True:  # printing utils
 		**kwargs,
 	):
 		return aprint(__o, arrow_fn=arrow_fn, **kwargs)
+
+	def as_block_text(s, /, line_length: int = 70) -> str:
+		"""Split text on whitespace and reassemble it into lines no longer than the given line length."""
+		words = s.replace("\n", " ").split()
+		result_lines = []
+		current_line = ""
+
+		for word in words:
+			if not current_line:
+				current_line = word
+			else:
+				if len(current_line) + 1 + len(word) <= line_length:
+					current_line += " " + word
+				else:
+					result_lines.append(current_line)
+					current_line = word
+
+		if current_line:
+			result_lines.append(current_line)
+
+		return "\n".join(result_lines)
 
 
 if True:  # Evaluation Machinery
@@ -128,21 +150,44 @@ if True:  # Preprocessor functionality
 		def __repr__(self) -> str:
 			return "https://i.kym-cdn.com/entries/icons/original/000/023/397/C-658VsXoAo3ovC.jpg"
 
-	def include_path(path: p.Path) -> str:
+	def _include(path: p.Path) -> str:
 		return eval_placeholders_in_str(
 			path.read_text(encoding="utf-8"),
 			pat=REGEX_MAPPING.get(path.suffix.removeprefix("."), REGEX_MAPPING[None]),
 		)
 
 	def include(filename: str) -> str:
-		return include_path(TEMPLATES_DIR / filename).strip()
+		"""During pre-processing read the file of the given strpath (anchored at `/templates` dir). Return the contents of the file at said path as str."""
+		return _include(TEMPLATES_DIR / filename).strip()
+
+	def js_include(filename: str) -> str:
+		"""During pre-processing read the file of the given strpath (anchored at `/templates` dir). Apply further processing to escape any characters in the file and return a string containing a valid JS expression that evaluates to the string containing the contents of the requested file."""
+		return f"""
+(() => {{ /* Dynamically inserted JS string from {filename.replace("*/", "_/")!r} */
+	let ____backtick = "`"; let ____dollarenter = "${{";
+	return String.raw`{include(filename).replace("${", "${____dollarenter}").replace("`", "${____backtick}")}`
+}})()
+"""[1:-1]
 
 	EXPOSED_LOCALS = {
 		"include": include,
-		"include_path": include_path,
+		"include_path": _include,
 		"include_style": lambda s: f"<style>{include(s)}</style>",
 		"rr": ReprRepr(),
 		"void": void,
+		"now": datetime.now().astimezone(),
+		"PREPROCESSING_NOTE": (
+			f"! IMPORTANT NOTE IF YOU ARE EXAMINING THE CODE:\n\n{
+				as_block_text(
+					'''
+The contents of this source code file were altered using a pre-processor.
+The code WILL look unreadable. See the source code, contribute, or compile it yourself via github.
+'''.strip(),
+					line_length=70,
+				)
+			}"
+			* 1  # repeat the body of the announcement this many times
+		).strip(),
 	}
 
 
@@ -155,6 +200,22 @@ def __root__() -> None:
 	init_filename = "LeashedLibrus.user.js"
 
 	init_file = TEMPLATES_DIR / init_filename
+
+	if (
+		select.select(  # check if any shit is present in sys.stdin
+			[
+				sys.stdin,
+			],
+			[],
+			[],
+			0.0,
+		)[0]
+	) and (STDIN_TEXT := sys.stdin.read()):  # zed editor formatter hook fix
+		orig_sys_stdout = sys.stdout
+		sys.stdout = sys.stderr
+		orig_sys_stdout.write(STDIN_TEXT)
+		orig_sys_stdout.flush()
+		init_file.write_text(STDIN_TEXT)
 
 	if not init_file.is_file():
 		raise RuntimeError(f"Why is {f'/{init_file.relative_to(ROOT_DIR)}'!r} missing or not file? huh?")

@@ -15,9 +15,16 @@
 						<input type="checkbox" name="settings_css_hide_weekends" id="settings_css_hide_weekends" />
 						Ukryj weekendy w kalendarzach + lekko alternatywny wygląd kalendarzy (terminarz, plan lekcji)</label
 					><br />
+					<label for="tooltip_fixed_pos">
+						<input type="checkbox" name="tooltip_fixed_pos" id="tooltip_fixed_pos" />
+						Wyświetlaj tooltip box (pokazywany normalnie obok kursora) zawsze w lewym dolnym rogu.</label
+					><br />
 				</fieldset>
 				<fieldset>
-					<legend>Custom CSS (reset by loading page with <code>?reset</code> param)</legend>
+					<legend>
+						Custom CSS (w przypadku softlocku np <code>*{display: none}</code> załaduj stronę z na końcu dodanym
+						<code>?reset</code>)
+					</legend>
 					<textarea name="settings_customcss" id="settings_customcss" style="width: 100%; height: 100px"></textarea>
 				</fieldset>
 			</div>

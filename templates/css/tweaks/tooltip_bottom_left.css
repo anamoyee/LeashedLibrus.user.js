@@ -1,0 +1,7 @@
+.ui-tooltip {
+	position: fixed !important;
+	bottom: 3px !important;
+	left: 3px !important;
+	top: auto !important;
+	right: auto !important;
+}
